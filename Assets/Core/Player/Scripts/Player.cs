@@ -1,44 +1,49 @@
-﻿using UnityEngine;
+﻿using Platformer.Core.Input;
+using Platformer.Core.HealthBar;
+using UnityEngine;
 
 namespace Platformer.Core.Player
 {
-    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     
     public class Player : MonoBehaviour
     {
+        [SerializeField] private Health _playerHealth;
         [SerializeField] private float _forceUp;
-        [SerializeField] private float _forceLeftRight;
+        [SerializeField] private float _forceMove;
 
+        private InputManager _inputManager => InputManager.Instance;
         private Rigidbody2D _player;
 
         private void Awake()
         {
             _player = GetComponent<Rigidbody2D>();
+
+            _inputManager.EventMoveLeft += MoveLeft;
+            _inputManager.EventMoveRight += MoveRight;
+            _inputManager.EventJump += Jump;
         }
 
-        private void Update()
+        private void OnDestroy()
         {
-            // Check keyboard keys
-
-            if (Input.GetKey(KeyCode.Space))
-            {
-                AddForceToPlayer(new Vector2(0, _forceUp)); // Move to up
-            }
-
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                AddForceToPlayer(new Vector2(-_forceLeftRight, 0)); // Move to left
-            }
-
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                AddForceToPlayer(new Vector2(_forceLeftRight, 0)); // Move to right
-            }
+            _inputManager.EventMoveLeft -= MoveLeft;
+            _inputManager.EventMoveRight -= MoveRight;
+            _inputManager.EventJump -= Jump;
         }
+
+        private void MoveLeft() => AddForceToPlayer(new Vector2(-_forceMove, 0));
+        private void MoveRight() => AddForceToPlayer(new Vector2(_forceMove, 0));
+        private void Jump() => AddForceToPlayer(new Vector2(0, _forceUp));
 
         private void AddForceToPlayer(Vector2 force)
         {
-            _player.AddForce(force); // Add force to player
+            if (_playerHealth.HealthCount <= 0)
+            {
+                return;
+            }
+
+            _player.AddForce(force);
+            _playerHealth.DecreaseHealth();
         }
     }
 }
