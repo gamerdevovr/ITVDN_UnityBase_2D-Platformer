@@ -4,22 +4,14 @@ namespace Platformer.Core.Camera
 {
     public class CameraFollower : MonoBehaviour
     {
-        [SerializeField] private Transform Player; // Player Object
-        [SerializeField] private float _speed = 0.01f; // Speed of camera (Lerp)
+        [SerializeField] private Transform _player;
+        [SerializeField] private float _lerpSpeed = 0.01f;
+        [SerializeField] private Vector3 _offsetCamera;
 
-        private Transform _camera; // Camera Object
-
-        private void Awake()
+        private void LateUpdate() // Йде оновлення після усіх айпдейтів
         {
-            _camera = GetComponent<Transform>();
-        }
-
-        private void Update()
-        {
-            var cameraPosition = _camera.position; // Get position of Camera
-            cameraPosition.x = Mathf.Lerp(cameraPosition.x, Player.position.x, _speed); // Edit position
-
-            _camera.position = cameraPosition; // Update Camera position
+            Vector3 newCamPosition = _player.position + _offsetCamera;
+            transform.position = Vector3.Lerp(transform.position, newCamPosition, _lerpSpeed);
         }
     }
 }

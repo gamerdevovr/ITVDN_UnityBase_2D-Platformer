@@ -33,8 +33,6 @@ namespace Platformer.Core.HealthBar
             }
 
             _healthCount -= _decreaseCount;
-
-            Debug.Log("DecreaseHealth");
         }
 
         private void UpdateHealth()
